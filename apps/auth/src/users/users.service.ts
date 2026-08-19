@@ -16,7 +16,7 @@ export class UsersService {
   private async validateCreateUserDto(createUserDto: CreateUserDto) {
     try {
       await this.usersRepository.findOne({ email: createUserDto.email });
-    } catch (err) {
+    } catch {
       return;
     }
 

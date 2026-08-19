@@ -27,4 +27,4 @@ async function bootstrap() {
   await app.startAllMicroservices();
   await app.listen(configService.get<number>('HTTP_PORT') ?? 3001);
 }
-bootstrap();
+bootstrap().catch((reason) => console.error(reason));
