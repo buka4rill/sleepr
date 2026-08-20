@@ -21,12 +21,12 @@ export class NotificationsService {
     });
   }
 
-  async notifyEmail({ email }: NotifyEmailDto) {
+  async notifyEmail({ email, text }: NotifyEmailDto) {
     await this.transporter.sendMail({
       from: this.configService.get('SMTP_USER'),
       to: email,
       subject: 'Sleepr Notification',
-      text: 'You have a new notification.',
+      text,
     });
   }
 }
