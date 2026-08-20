@@ -40,9 +40,10 @@ export class ReservationsService {
     };
 
     return this.paymentsService.send('create_charge', charge).pipe(
-      mergeMap(() =>
+      mergeMap((res: { id: string }) =>
         this.reservationsRepository.create({
           ...createReservationDto,
+          invoiceId: res.id, // payment intent id
           timestamp: new Date(),
           userId,
         }),
