@@ -1,14 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { NOTIFICATIONS_SERVICE } from '@app/common';
 import Stripe from 'stripe';
 import { randomUUID } from 'crypto';
-import { CreateChargeDto } from '@app/common';
+import { PaymentsCreateChargeDto } from './dto/payments-create-charge.dto';
 
 @Injectable()
 export class PaymentsService {
   private readonly stripe: Stripe;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(NOTIFICATIONS_SERVICE)
+    private readonly notificationsService: ClientProxy,
+  ) {
     this.stripe = new Stripe(
       this.configService.getOrThrow<string>('STRIPE_SECRET_KEY'),
       {
@@ -17,7 +24,12 @@ export class PaymentsService {
     );
   }
 
-  async createCharge({ card, amount, idempotencyKey }: CreateChargeDto) {
+  async createCharge({
+    card,
+    amount,
+    email,
+    idempotencyKey,
+  }: PaymentsCreateChargeDto) {
     // Fall back to a server-generated key if the caller didn't send one.
     // The fallback only de-dupes retries *within this single call* (e.g.
     // Stripe's own SDK-level network retries, which already attach their
@@ -62,6 +74,9 @@ export class PaymentsService {
       // that matters most for preventing a duplicate charge on retry.
       { idempotencyKey: `${key}:payment-intent` },
     );
+
+    // emit notification
+    this.notificationsService.emit('notify_email', { email });
 
     return paymentIntent;
   }

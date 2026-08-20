@@ -7,7 +7,7 @@ import {
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ReservationsRepository } from './reservations.repository';
-import { PAYMENTS_SERVICE } from '@app/common';
+import { PAYMENTS_SERVICE, UserDto } from '@app/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, mergeMap, Observable } from 'rxjs';
 import { ReservationDocument } from './models/reservation.schema';
@@ -24,7 +24,7 @@ export class ReservationsService {
 
   create(
     createReservationDto: CreateReservationDto,
-    userId: string,
+    { email, _id: userId }: UserDto,
   ): Observable<ReservationDocument> {
     // Generate the idempotency key once per reservation attempt (not per
     // Stripe call) so a caller-side retry that reuses this same DTO reaches
@@ -35,6 +35,7 @@ export class ReservationsService {
     // fills the gap when it doesn't.
     const charge = {
       ...createReservationDto.charge,
+      email,
       idempotencyKey:
         createReservationDto.charge.idempotencyKey ?? randomUUID(),
     };
