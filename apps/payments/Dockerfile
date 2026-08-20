@@ -4,12 +4,16 @@ WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY pnpm-lock.yaml ./
+COPY tsconfig.json tsconfig.json
 
 RUN npm install -g corepack@latest && corepack enable && corepack prepare --activate
 
 RUN pnpm install
 
-COPY . .
+COPY apps/payments apps/payments
+COPY libs libs
+
+RUN cd apps/payments && pnpm install
 
 RUN pnpm run build
 

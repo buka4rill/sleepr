@@ -4,12 +4,16 @@ WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY pnpm-lock.yaml ./
+COPY tsconfig.json tsconfig.json
 
 RUN npm install -g corepack@latest && corepack enable && corepack prepare --activate
 
 RUN pnpm install
 
-COPY . .
+COPY apps/notifications apps/notifications
+COPY libs libs
+
+RUN cd apps/notifications && pnpm install
 
 RUN pnpm run build
 
