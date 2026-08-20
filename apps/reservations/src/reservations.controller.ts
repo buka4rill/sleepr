@@ -13,6 +13,8 @@ import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { CurrentUser, JwtAuthGuard } from '@app/common';
 import type { UserDto } from '@app/common';
+import { Observable } from 'rxjs';
+import { ReservationDocument } from './models/reservation.schema';
 
 @Controller('reservations')
 export class ReservationsController {
@@ -20,22 +22,22 @@ export class ReservationsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async create(
+  create(
     @Body() createReservationDto: CreateReservationDto,
     @CurrentUser() user: UserDto,
-  ) {
+  ): Observable<ReservationDocument> {
     return this.reservationsService.create(createReservationDto, user._id);
   }
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async findAll() {
+  async findAll(): Promise<ReservationDocument[]> {
     return this.reservationsService.findAll();
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string): Promise<ReservationDocument> {
     return this.reservationsService.findOne(id);
   }
 
@@ -44,13 +46,13 @@ export class ReservationsController {
   async update(
     @Param('id') id: string,
     @Body() updateReservationDto: UpdateReservationDto,
-  ) {
+  ): Promise<ReservationDocument> {
     return this.reservationsService.update(id, updateReservationDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string): Promise<ReservationDocument> {
     return this.reservationsService.remove(id);
   }
 }
