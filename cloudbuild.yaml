@@ -58,3 +58,6 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       ['push', 'us-east1-docker.pkg.dev/sleepr-506112/payments/production']
+
+options:
+  logging: CLOUD_LOGGING_ONLY
