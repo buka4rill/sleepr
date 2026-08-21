@@ -4,18 +4,17 @@ WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
 COPY tsconfig.json tsconfig.json
 
 RUN npm install -g corepack@latest && corepack enable && corepack prepare --activate
 
-RUN pnpm install
-
 COPY apps/auth apps/auth
 COPY libs libs
 
-RUN cd apps/auth && pnpm install
+RUN pnpm install -r
 
-RUN pnpm run build
+RUN pnpm run build auth
 
 FROM node:alpine AS production
 
@@ -26,10 +25,13 @@ WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
+COPY apps/auth/package.json apps/auth/package.json
+COPY libs/common/package.json libs/common/package.json
 
 RUN npm install -g corepack@latest && corepack enable && corepack prepare --activate
 
-RUN pnpm install  --prod
+RUN pnpm install --prod --filter sleepr --filter auth...
 
 COPY --from=development /usr/src/app/dist ./dist
 

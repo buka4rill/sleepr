@@ -4,18 +4,17 @@ WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
 COPY tsconfig.json tsconfig.json
 
 RUN npm install -g corepack@latest && corepack enable && corepack prepare --activate
 
-RUN pnpm install
-
 COPY apps/notifications apps/notifications
 COPY libs libs
 
-RUN cd apps/notifications && pnpm install
+RUN pnpm install -r
 
-RUN pnpm run build
+RUN pnpm run build notifications
 
 FROM node:alpine AS production
 
@@ -26,10 +25,13 @@ WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
+COPY apps/notifications/package.json apps/notifications/package.json
+COPY libs/common/package.json libs/common/package.json
 
 RUN npm install -g corepack@latest && corepack enable && corepack prepare --activate
 
-RUN pnpm install  --prod
+RUN pnpm install --prod --filter sleepr --filter notifications...
 
 COPY --from=development /usr/src/app/dist ./dist
 

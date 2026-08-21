@@ -1,9 +1,9 @@
 {
-  "name": "payments",
+  "name": "reservations",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
     "@app/common": "workspace:*",
-    "stripe": "^22.5.0"
+    "@nestjs/mapped-types": "*"
   }
 }

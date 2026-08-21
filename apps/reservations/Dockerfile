@@ -4,16 +4,19 @@ WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
 COPY tsconfig.json tsconfig.json
+COPY nest-cli.json nest-cli.json
+
 
 RUN npm install -g corepack@latest && corepack enable && corepack prepare --activate
-
-RUN pnpm install
 
 COPY apps/reservations apps/reservations
 COPY libs libs
 
-RUN pnpm run build
+RUN pnpm install -r
+
+RUN pnpm run build reservations
 
 FROM node:alpine AS production
 
@@ -24,10 +27,13 @@ WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
+COPY apps/reservations/package.json apps/reservations/package.json
+COPY libs/common/package.json libs/common/package.json
 
 RUN npm install -g corepack@latest && corepack enable && corepack prepare --activate
 
-RUN pnpm install  --prod
+RUN pnpm install --prod --filter sleepr --filter reservations...
 
 COPY --from=development /usr/src/app/dist ./dist
 

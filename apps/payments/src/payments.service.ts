@@ -29,7 +29,7 @@ export class PaymentsService {
     amount,
     email,
     idempotencyKey,
-  }: PaymentsCreateChargeDto) {
+  }: PaymentsCreateChargeDto): Promise<Stripe.Response<Stripe.PaymentIntent>> {
     // Fall back to a server-generated key if the caller didn't send one.
     // The fallback only de-dupes retries *within this single call* (e.g.
     // Stripe's own SDK-level network retries, which already attach their
