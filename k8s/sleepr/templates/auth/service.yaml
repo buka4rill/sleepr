@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+spec:
+  selector:
+    app: auth
+  ports:
+    - name: http
+      port: {{ .Values.auth.env.HTTP_PORT }}
+      targetPort: {{ .Values.auth.env.HTTP_PORT }}
+    - name: tcp
+      port: {{ .Values.auth.env.TCP_PORT }}
+      targetPort: {{ .Values.auth.env.TCP_PORT }}

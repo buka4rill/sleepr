@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: payments
+  name: payments
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments
+  template:
+    metadata:
+      labels:
+        app: payments
+    spec:
+      containers:
+        - image: "{{ .Values.payments.image.repository }}:{{ .Values.payments.image.tag }}"
+          name: payments
+          imagePullPolicy: {{ .Values.payments.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: payments-config
+            - secretRef:
+                name: payments-secret

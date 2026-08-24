@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: notifications
+  name: notifications
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notifications
+  template:
+    metadata:
+      labels:
+        app: notifications
+    spec:
+      containers:
+        - image: "{{ .Values.notifications.image.repository }}:{{ .Values.notifications.image.tag }}"
+          name: notifications
+          imagePullPolicy: {{ .Values.notifications.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: notifications-config
+            - secretRef:
+                name: notifications-secret

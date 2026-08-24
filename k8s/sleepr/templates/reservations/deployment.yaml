@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: reservations
+  name: reservations
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reservations
+  template:
+    metadata:
+      labels:
+        app: reservations
+    spec:
+      containers:
+        - image: "{{ .Values.reservations.image.repository }}:{{ .Values.reservations.image.tag }}"
+          name: reservations
+          imagePullPolicy: {{ .Values.reservations.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: reservations-config

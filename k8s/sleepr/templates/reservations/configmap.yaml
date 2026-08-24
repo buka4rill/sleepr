@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reservations-config
+data:
+  MONGODB_URI: {{ .Values.mongodb.uri | quote }}
+  PORT: {{ .Values.reservations.env.PORT | quote }}
+  AUTH_HOST: {{ .Values.reservations.env.AUTH_HOST | quote }}
+  AUTH_PORT: {{ .Values.reservations.env.AUTH_PORT | quote }}
+  PAYMENTS_HOST: {{ .Values.reservations.env.PAYMENTS_HOST | quote }}
+  PAYMENTS_PORT: {{ .Values.reservations.env.PAYMENTS_PORT | quote }}

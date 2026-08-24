@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: auth
+  name: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - image: "{{ .Values.auth.image.repository }}:{{ .Values.auth.image.tag }}"
+          name: auth
+          imagePullPolicy: {{ .Values.auth.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: auth-config
+            - secretRef:
+                name: auth-secret

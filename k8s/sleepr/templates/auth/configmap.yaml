@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-config
+data:
+  MONGODB_URI: {{ .Values.mongodb.uri | quote }}
+  HTTP_PORT: {{ .Values.auth.env.HTTP_PORT | quote }}
+  TCP_PORT: {{ .Values.auth.env.TCP_PORT | quote }}
+  JWT_EXPIRATION: {{ .Values.auth.env.JWT_EXPIRATION | quote }}

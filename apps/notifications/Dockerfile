@@ -6,6 +6,7 @@ COPY package.json ./
 COPY pnpm-lock.yaml ./
 COPY pnpm-workspace.yaml ./
 COPY tsconfig.json tsconfig.json
+COPY nest-cli.json nest-cli.json
 
 RUN npm install -g corepack@latest && corepack enable && corepack prepare --activate
 

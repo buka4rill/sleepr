@@ -1,0 +1,51 @@
+mongodb:
+  uri: mongodb://mongo:27017/sleepr
+
+reservations:
+  image:
+    repository: us-east1-docker.pkg.dev/sleepr-506112/reservations/production
+    tag: latest
+    pullPolicy: Always
+  env:
+    PORT: "3000"
+    AUTH_HOST: auth
+    AUTH_PORT: "3002"
+    PAYMENTS_HOST: payments
+    PAYMENTS_PORT: "3003"
+
+auth:
+  image:
+    repository: us-east1-docker.pkg.dev/sleepr-506112/auth/production
+    tag: latest
+    pullPolicy: Always
+  env:
+    HTTP_PORT: "3001"
+    TCP_PORT: "3002"
+    JWT_EXPIRATION: "3600"
+  secrets:
+    JWT_SECRET: ""
+
+payments:
+  image:
+    repository: us-east1-docker.pkg.dev/sleepr-506112/payments/production
+    tag: latest
+    pullPolicy: Always
+  env:
+    PORT: "3003"
+    NOTIFICATIONS_HOST: notifications
+    NOTIFICATIONS_PORT: "3004"
+  secrets:
+    STRIPE_SECRET_KEY: ""
+
+notifications:
+  image:
+    repository: us-east1-docker.pkg.dev/sleepr-506112/notifications/production
+    tag: latest
+    pullPolicy: Always
+  env:
+    PORT: "3004"
+  secrets:
+    GOOGLE_OAUTH_CLIENT_ID: ""
+    SMTP_USER: ""
+    GOOGLE_OAUTH_CLIENT_SECRET: ""
+    GOOGLE_OAUTH_REFRESH_TOKEN: ""

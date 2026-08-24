@@ -42,6 +42,9 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
+# Helm secret overrides (real credentials, never commit)
+values.secrets.yaml
+
 # temp directory
 .temp
 .tmp

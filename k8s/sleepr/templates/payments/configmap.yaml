@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payments-config
+data:
+  PORT: {{ .Values.payments.env.PORT | quote }}
+  NOTIFICATIONS_HOST: {{ .Values.payments.env.NOTIFICATIONS_HOST | quote }}
+  NOTIFICATIONS_PORT: {{ .Values.payments.env.NOTIFICATIONS_PORT | quote }}
