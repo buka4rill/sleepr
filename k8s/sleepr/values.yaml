@@ -9,6 +9,8 @@ reservations:
     AUTH_PORT: "3002"
     PAYMENTS_HOST: payments
     PAYMENTS_PORT: "3003"
+  service:
+    type: LoadBalancer
   secrets:
     MONGODB_URI: ""
 
@@ -21,6 +23,8 @@ auth:
     HTTP_PORT: "3001"
     TCP_PORT: "3002"
     JWT_EXPIRATION: "3600"
+  service:
+    type: LoadBalancer
   secrets:
     JWT_SECRET: ""
     MONGODB_URI: ""

@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: reservations
 spec:
+  type: {{ .Values.reservations.service.type }}
   selector:
     app: reservations
   ports:

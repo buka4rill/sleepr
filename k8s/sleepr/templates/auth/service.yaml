@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: auth
 spec:
+  type: {{ .Values.auth.service.type }}
   selector:
     app: auth
   ports:
