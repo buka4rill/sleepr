@@ -1,6 +1,3 @@
-mongodb:
-  uri: mongodb://mongo:27017/sleepr
-
 reservations:
   image:
     repository: us-east1-docker.pkg.dev/sleepr-506112/reservations/production
@@ -12,6 +9,8 @@ reservations:
     AUTH_PORT: "3002"
     PAYMENTS_HOST: payments
     PAYMENTS_PORT: "3003"
+  secrets:
+    MONGODB_URI: ""
 
 auth:
   image:
@@ -24,6 +23,7 @@ auth:
     JWT_EXPIRATION: "3600"
   secrets:
     JWT_SECRET: ""
+    MONGODB_URI: ""
 
 payments:
   image:

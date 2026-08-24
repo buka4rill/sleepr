@@ -21,3 +21,5 @@ spec:
           envFrom:
             - configMapRef:
                 name: reservations-config
+            - secretRef:
+                name: reservations-secret
