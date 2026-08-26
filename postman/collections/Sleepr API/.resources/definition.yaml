@@ -1,0 +1,12 @@
+$kind: collection
+name: Sleepr API
+description: REST API collection for the Sleepr hotel reservation microservices app. Covers Auth and Reservations services. Payments and Notifications are internal TCP microservices with no HTTP endpoints.
+variables:
+  - key: baseUrl
+    value: 'http://localhost:3000'
+  - key: authBaseUrl
+    value: 'http://localhost:3001'
+  - key: jwt
+    value: ''
+  - key: reservationId
+    value: ''

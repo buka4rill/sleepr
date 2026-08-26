@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Current User
+method: GET
+url: '{{authBaseUrl}}/users'
+order: 3000
+description: Get the currently authenticated user's profile. Requires JWT authentication via cookie.
+headers:
+  - key: Cookie
+    value: 'Authentication={{jwt}}'

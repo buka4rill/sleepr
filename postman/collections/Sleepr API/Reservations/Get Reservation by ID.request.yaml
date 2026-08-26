@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Reservation by ID
+method: GET
+url: '{{baseUrl}}/reservations/{{reservationId}}'
+order: 3000
+description: Retrieve a single reservation by its MongoDB ObjectId.
+headers:
+  - key: Cookie
+    value: 'Authentication={{jwt}}'

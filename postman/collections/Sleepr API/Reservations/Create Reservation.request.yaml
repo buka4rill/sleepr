@@ -1,0 +1,33 @@
+$kind: http-request
+name: Create Reservation
+method: POST
+url: '{{baseUrl}}/reservations'
+order: 1000
+description: Create a new reservation. Triggers a payment charge via the Payments microservice. Use a Stripe test token (e.g. `tok_visa`) for the card field.
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Cookie
+    value: 'Authentication={{jwt}}'
+body:
+  type: json
+  content: |-
+    {
+      "startDate": "2025-01-15T00:00:00.000Z",
+      "endDate": "2025-01-20T00:00:00.000Z",
+      "charge": {
+        "amount": 500,
+        "card": {
+          "token": "tok_visa"
+        }
+      }
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      const response = pm.response.json();
+      if (response._id) {
+        pm.collectionVariables.set('reservationId', response._id);
+        console.log('Reservation ID saved:', response._id);
+      }

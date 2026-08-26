@@ -1,0 +1,16 @@
+$kind: http-request
+name: Register User
+method: POST
+url: '{{authBaseUrl}}/users'
+order: 1000
+description: Create a new user account. Password must be strong (uppercase, lowercase, number, special char).
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "user@example.com",
+      "password": "StrongP@ssw0rd!"
+    }

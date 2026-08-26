@@ -1,0 +1,18 @@
+$kind: http-request
+name: Update Reservation
+method: PATCH
+url: '{{baseUrl}}/reservations/{{reservationId}}'
+order: 4000
+description: Partially update a reservation. All fields are optional (PartialType of CreateReservationDto).
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Cookie
+    value: 'Authentication={{jwt}}'
+body:
+  type: json
+  content: |-
+    {
+      "startDate": "2025-01-16T00:00:00.000Z",
+      "endDate": "2025-01-22T00:00:00.000Z"
+    }

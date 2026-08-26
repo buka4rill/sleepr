@@ -1,0 +1,9 @@
+$kind: http-request
+name: Delete Reservation
+method: DELETE
+url: '{{baseUrl}}/reservations/{{reservationId}}'
+order: 5000
+description: Delete a reservation by ID. Returns the deleted reservation document.
+headers:
+  - key: Cookie
+    value: 'Authentication={{jwt}}'
