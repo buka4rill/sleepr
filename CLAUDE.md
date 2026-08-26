@@ -71,3 +71,12 @@ helm upgrade --install sleepr k8s/sleepr -f k8s/sleepr/values.yaml -f k8s/sleepr
 - Not yet done: `livenessProbe`/`readinessProbe` on any Deployment (the `HealthModule` above exists but isn't wired up yet), `resources` requests/limits, HPA, an automated deploy step in `cloudbuild.yaml`, HTTPS/managed cert + domain + reserved static IP on the Gateway, and explicit Gateway health checks (currently working only incidentally, via GCLB's default `/` check).
 
 For the deployment topology (Services, Pods, external dependencies), see `architecture-diagram.jpg` in the repo root.
+
+## API testing (Postman)
+
+`postman/` holds a Postman **file-based collection** ("Sleepr API"), synced via Postman's Local Git integration (`.postman/resources.yaml` links this folder to a Postman workspace). Requests never hardcode a host — they use `{{baseUrl}}` (reservations) and `{{authBaseUrl}}` (auth) collection variables, so switching hosts is just switching the active Postman environment:
+
+- `postman/environments/Local.environment.yaml` — `baseUrl`/`authBaseUrl` → `localhost:3000`/`localhost:3001`, for either local setup in the section above.
+- `postman/environments/Production.environment.yaml` — both point at the GKE Gateway IP (plain `http://`, no TLS — see the Gateway caveat above). That IP is **not reserved**, so re-check/update this file if the Gateway gets recreated.
+
+Session state (`jwt`, `reservationId`) stays as collection variables in `.resources/definition.yaml`, auto-populated by `afterResponse` scripts on Login/Create Reservation — those aren't environment-specific.
