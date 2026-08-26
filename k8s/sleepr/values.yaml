@@ -1,3 +1,7 @@
+gateway:
+  enabled: false
+  className: ""
+
 reservations:
   image:
     repository: us-east1-docker.pkg.dev/sleepr-506112/reservations/production

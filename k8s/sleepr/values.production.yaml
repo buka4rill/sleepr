@@ -1,0 +1,11 @@
+gateway:
+  enabled: true
+  className: gke-l7-global-external-managed
+
+reservations:
+  service:
+    type: ClusterIP
+
+auth:
+  service:
+    type: ClusterIP
