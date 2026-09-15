@@ -52,4 +52,4 @@ services:
       - /usr/src/app/node_modules
 
   mongo:
-    image: mongo
+    image: mongo:7.0
