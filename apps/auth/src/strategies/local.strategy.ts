@@ -14,7 +14,9 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     try {
       return await this.usersService.verifyUser(email, password);
     } catch (error) {
-      throw new UnauthorizedException(error);
+      throw new UnauthorizedException(
+        error instanceof Error ? error.message : 'Invalid credentials',
+      );
     }
   }
 }

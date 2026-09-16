@@ -8,6 +8,7 @@ import { TokenPayload } from '../interfaces/token-payload.interface';
 interface AuthRequest {
   cookies?: Record<string, string | undefined>;
   Authentication?: string;
+  headers?: Record<string, string | undefined>;
 }
 
 @Injectable()
@@ -22,7 +23,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: AuthRequest) => {
           const token =
-            request?.cookies?.Authentication || request?.Authentication;
+            request?.cookies?.Authentication ||
+            request?.Authentication ||
+            request?.headers?.authentication;
           return token || null;
         },
       ]),

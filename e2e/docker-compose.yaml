@@ -28,11 +28,15 @@ services:
     image: us-east1-docker.pkg.dev/sleepr-506112/payments/production
     env_file:
       - ../apps/payments/.env
+    ports:
+      - '3003:3003'
 
   notifications:
     image: us-east1-docker.pkg.dev/sleepr-506112/notifications/production
     env_file:
       - ../apps/notifications/.env
+    ports:
+      - '3004:3004'
 
   mongo:
     image: mongo:7.0
