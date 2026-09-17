@@ -46,6 +46,8 @@ export class JwtAuthGuard implements CanActivate {
       })
       .pipe(
         tap((res) => {
+          request.user = res;
+
           if (!roles || roles.length === 0) return;
           for (const role of roles) {
             if (!res.roles?.includes(role)) {
@@ -53,8 +55,6 @@ export class JwtAuthGuard implements CanActivate {
               throw new UnauthorizedException();
             }
           }
-
-          request.user = res;
         }),
         map(() => true),
         catchError((err) => {
