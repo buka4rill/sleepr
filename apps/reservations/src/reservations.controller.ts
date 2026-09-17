@@ -11,7 +11,7 @@ import {
 import { ReservationsService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
-import { CurrentUser, JwtAuthGuard } from '@app/common';
+import { CurrentUser, JwtAuthGuard, Roles } from '@app/common';
 import type { UserDto } from '@app/common';
 import { Observable } from 'rxjs';
 import { ReservationDocument } from './models/reservation.schema';
@@ -52,6 +52,7 @@ export class ReservationsController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
+  @Roles('Admin')
   async remove(@Param('id') id: string): Promise<ReservationDocument> {
     return this.reservationsService.remove(id);
   }
