@@ -1,6 +1,8 @@
 import { AbstractDocument } from '@app/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
+export type ReservationStatus = 'pending' | 'confirmed' | 'cancelled';
+
 @Schema({ versionKey: false })
 export class ReservationDocument extends AbstractDocument {
   @Prop()
@@ -16,7 +18,16 @@ export class ReservationDocument extends AbstractDocument {
   userId!: string;
 
   @Prop()
-  invoiceId!: string;
+  invoiceId?: string;
+
+  @Prop()
+  amount!: number;
+
+  @Prop({ default: 'pending' })
+  status!: ReservationStatus;
+
+  @Prop()
+  checkoutSessionId?: string;
 }
 
 export const ReservationSchema =

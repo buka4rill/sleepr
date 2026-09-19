@@ -6,6 +6,10 @@ import { NOTIFICATIONS_SERVICE } from '@app/common';
 import Stripe from 'stripe';
 import { randomUUID } from 'crypto';
 import { PaymentsCreateChargeDto } from './dto/payments-create-charge.dto';
+import {
+  CheckoutSessionCreated,
+  CreateCheckoutSessionDto,
+} from '@app/common/dto/create-checkout-session.dto';
 
 @Injectable()
 export class PaymentsService {
@@ -50,13 +54,13 @@ export class PaymentsService {
     const paymentMethod = await this.stripe.paymentMethods.create(
       {
         type: 'card',
-        card: card.token
+        card: card?.token
           ? { token: card.token }
           : {
-              number: card.number,
-              exp_month: card.exp_month,
-              exp_year: card.exp_year,
-              cvc: card.cvc,
+              number: card!.number,
+              exp_month: card!.exp_month,
+              exp_year: card!.exp_year,
+              cvc: card!.cvc,
             },
       },
       { idempotencyKey: `${key}:payment-method` },
@@ -82,5 +86,37 @@ export class PaymentsService {
     });
 
     return paymentIntent;
+  }
+
+  async createCheckoutSession({
+    amount,
+    email,
+    reservationId,
+  }: CreateCheckoutSessionDto): Promise<CheckoutSessionCreated> {
+    const session = await this.stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `Sleepr Reservation ${reservationId}`,
+            },
+            unit_amount: Math.round(amount * 100),
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      customer_email: email,
+      client_reference_id: reservationId,
+      success_url: this.configService.getOrThrow('STRIPE_SUCCESS_URL'),
+      cancel_url: this.configService.getOrThrow('STRIPE_CANCEL_URL'),
+    });
+
+    return {
+      id: session.id,
+      url: session.url!,
+    };
   }
 }

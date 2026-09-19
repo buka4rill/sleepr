@@ -1,22 +1,24 @@
 import { Type } from 'class-transformer';
 import { CardDto } from './card.dto';
 import {
-  IsDefined,
   IsNotEmptyObject,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
   ValidateNested,
 } from 'class-validator';
 
 export class CreateChargeDto {
-  @IsDefined()
+  // @IsDefined()
+  @IsOptional()
   @IsNotEmptyObject()
   @ValidateNested()
   @Type(() => CardDto)
-  card!: CardDto;
+  card?: CardDto;
 
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @IsPositive()
   amount!: number;
 
   // Used as the Stripe idempotency key so a retried request reuses the

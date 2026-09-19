@@ -13,7 +13,6 @@ import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { CurrentUser, JwtAuthGuard, Roles } from '@app/common';
 import type { UserDto } from '@app/common';
-import { Observable } from 'rxjs';
 import { ReservationDocument } from './models/reservation.schema';
 
 @Controller('reservations')
@@ -25,7 +24,7 @@ export class ReservationsController {
   create(
     @Body() createReservationDto: CreateReservationDto,
     @CurrentUser() user: UserDto,
-  ): Observable<ReservationDocument> {
+  ): Promise<ReservationDocument> {
     return this.reservationsService.create(createReservationDto, user);
   }
 
