@@ -9,8 +9,6 @@ import cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(ReservationsModule);
 
-  app.connectMicroservice({ transport: Transport.TCP });
-
   app.use(cookieParser());
 
   // validation
@@ -20,6 +18,16 @@ async function bootstrap() {
   app.useLogger(app.get(Logger));
 
   const configService = app.get(ConfigService);
-  await app.listen(configService.get('PORT') ?? 3000);
+
+  app.connectMicroservice({
+    transport: Transport.TCP,
+    options: {
+      host: '0.0.0.0',
+      port: configService.get<number>('TCP_PORT') ?? 3006,
+    },
+  });
+  await app.startAllMicroservices();
+
+  await app.listen(configService.get('HTTP_PORT') ?? 3000);
 }
 bootstrap().catch((reason) => console.error(reason));

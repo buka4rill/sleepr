@@ -3,16 +3,22 @@ import {
   Inject,
   Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ReservationsRepository } from './reservations.repository';
-import { PAYMENTS_SERVICE, UserDto } from '@app/common';
+import {
+  PAYMENTS_SERVICE,
+  UserDto,
+  CheckoutSessionCreated,
+  PaymentFailedDto,
+  PaymentSucceededDto,
+} from '@app/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { ReservationDocument } from './models/reservation.schema';
 import { randomUUID } from 'crypto';
-import { CheckoutSessionCreated } from '@app/common/dto/create-checkout-session.dto';
 
 @Injectable()
 export class ReservationsService {
@@ -111,6 +117,44 @@ export class ReservationsService {
       throw new BadRequestException(
         'Failed to create reservation with checkout session',
       );
+    }
+  }
+
+  async handlePaymentSucceeded({
+    reservationId,
+    paymentIntentId,
+  }: PaymentSucceededDto) {
+    this.logger.log(`Payment succeeded for reservation ${reservationId}`);
+
+    try {
+      await this.reservationsRepository.findOneAndUpdate(
+        { _id: reservationId },
+        { $set: { status: 'confirmed', invoiceId: paymentIntentId } },
+      );
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) {
+        throw error;
+      }
+      this.logger.warn(
+        `Received payment for unknown reservation ${reservationId}`,
+      );
+    }
+  }
+
+  async handlePaymentFailed({ reservationId, reason }: PaymentFailedDto) {
+    this.logger.log(
+      `Payment failed for reservation ${reservationId}: ${reason}`,
+    );
+
+    try {
+      await this.reservationsRepository.findOneAndUpdate(
+        { _id: reservationId, status: 'pending' },
+        { $set: { status: 'cancelled' } },
+      );
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) {
+        throw error;
+      }
     }
   }
 

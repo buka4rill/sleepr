@@ -1,24 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { NOTIFICATIONS_SERVICE } from '@app/common';
+import {
+  NOTIFICATIONS_SERVICE,
+  RESERVATIONS_SERVICE,
+  PAYMENT_SUCCEEDED_EVENT,
+  PAYMENT_FAILED_EVENT,
+  CheckoutSessionCreated,
+  CreateCheckoutSessionDto,
+} from '@app/common';
 import Stripe from 'stripe';
 import { randomUUID } from 'crypto';
 import { PaymentsCreateChargeDto } from './dto/payments-create-charge.dto';
-import {
-  CheckoutSessionCreated,
-  CreateCheckoutSessionDto,
-} from '@app/common/dto/create-checkout-session.dto';
 
 @Injectable()
 export class PaymentsService {
+  private readonly logger = new Logger(PaymentsService.name);
   private readonly stripe: Stripe;
 
   constructor(
     private readonly configService: ConfigService,
     @Inject(NOTIFICATIONS_SERVICE)
     private readonly notificationsService: ClientProxy,
+    @Inject(RESERVATIONS_SERVICE)
+    private readonly reservationsService: ClientProxy,
   ) {
     this.stripe = new Stripe(
       this.configService.getOrThrow<string>('STRIPE_SECRET_KEY'),
@@ -110,6 +115,9 @@ export class PaymentsService {
       mode: 'payment',
       customer_email: email,
       client_reference_id: reservationId,
+      metadata: {
+        reservationId,
+      },
       success_url: this.configService.getOrThrow('STRIPE_SUCCESS_URL'),
       cancel_url: this.configService.getOrThrow('STRIPE_CANCEL_URL'),
     });
@@ -118,5 +126,68 @@ export class PaymentsService {
       id: session.id,
       url: session.url!,
     };
+  }
+
+  constructEvent(payload: Buffer, signature: string): Stripe.Event {
+    return this.stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      this.configService.get<string>('STRIPE_WEBHOOK_SECRET') as string,
+    );
+  }
+
+  handleEvent(event: Stripe.Event) {
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        // const session = event.data.object;
+        this.handlePaymentSucceeded(event.data.object);
+        break;
+      }
+      case 'checkout.session.expired': {
+        this.handlePaymentFailed(event.data.object, event.type);
+        break;
+      }
+
+      default:
+        this.logger.debug(`Unhandled Stripe event type: ${event.type}`);
+    }
+  }
+
+  private handlePaymentSucceeded(session: Stripe.Checkout.Session) {
+    const reservationId = session.metadata?.reservationId;
+    if (!reservationId) {
+      this.logger.warn(
+        `Checkout session ${session.id} completed without a reservationId`,
+      );
+      return;
+    }
+
+    this.reservationsService.emit(PAYMENT_SUCCEEDED_EVENT, {
+      reservationId,
+      paymentIntentId: session.payment_intent,
+    });
+
+    const email = session.customer_details?.email ?? session.customer_email;
+    if (email) {
+      this.notificationsService.emit('notify_email', {
+        email,
+        text: `Your payment for ${(session.amount_total ?? 0) / 100} was successful.`,
+      });
+    }
+  }
+
+  private handlePaymentFailed(
+    session: Stripe.Checkout.Session,
+    reason: string,
+  ) {
+    const reservationId = session.metadata?.reservationId;
+    if (!reservationId) {
+      return;
+    }
+
+    this.reservationsService.emit(PAYMENT_FAILED_EVENT, {
+      reservationId,
+      reason,
+    });
   }
 }

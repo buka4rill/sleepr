@@ -13,6 +13,7 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+      - /usr/src/app/apps/reservations/node_modules
 
   auth:
     build:
@@ -27,6 +28,7 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+      - /usr/src/app/apps/auth/node_modules
 
   payments:
     build:
@@ -34,11 +36,14 @@ services:
       dockerfile: ./apps/payments/Dockerfile
       target: development
     command: pnpm run start:dev payments
+    ports:
+      - '3005:3005'
     env_file:
       - ./apps/payments/.env
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+      - /usr/src/app/apps/payments/node_modules
 
   notifications:
     build:
@@ -51,6 +56,7 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+      - /usr/src/app/apps/notifications/node_modules
 
   mongo:
     image: mongo:7.0
