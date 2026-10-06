@@ -57,6 +57,9 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
       - /usr/src/app/apps/notifications/node_modules
-
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - '5672:5672'
   mongo:
     image: mongo:7.0

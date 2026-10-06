@@ -34,10 +34,10 @@ import { StripeWebhookController } from './stripe-webhook.controller';
       {
         name: NOTIFICATIONS_SERVICE,
         useFactory: (configService: ConfigService) => ({
-          transport: Transport.TCP,
+          transport: Transport.RMQ,
           options: {
-            host: configService.get<string>('NOTIFICATIONS_HOST'),
-            port: configService.get<number>('NOTIFICATIONS_PORT'),
+            urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
+            queue: 'notifications',
           },
         }),
         inject: [ConfigService],
@@ -45,10 +45,10 @@ import { StripeWebhookController } from './stripe-webhook.controller';
       {
         name: RESERVATIONS_SERVICE,
         useFactory: (configService: ConfigService) => ({
-          transport: Transport.TCP,
+          transport: Transport.RMQ,
           options: {
-            host: configService.get<string>('RESERVATIONS_HOST'),
-            port: configService.get<number>('RESERVATIONS_PORT'),
+            urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
+            queue: 'reservations',
           },
         }),
         inject: [ConfigService],
